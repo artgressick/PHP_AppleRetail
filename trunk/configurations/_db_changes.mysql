@@ -1,0 +1,886 @@
+CREATE TABLE Users (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  bDeleted TINYINT NOT NULL DEFAULT 0,
+  chrFirst VARCHAR(30) NOT NULL, 
+  chrLast VARCHAR(30) NOT NULL, 
+  chrEmail VARCHAR(60) NOT NULL,
+  chrPassword VARCHAR(40)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE EmailMessages (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idSender SMALLINT NOT NULL,
+  idDistro SMALLINT NOT NULL,
+  idType SMALLINT NOT NULL,
+  dtStamp TIMESTAMP NOT NULL,
+  chrCC VARCHAR(255),
+  txtMessage TEXT
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* April 25, 2007*/
+Alter TABLE EmailMessages ADD intAttachmentSize int After idType;
+Alter TABLE EmailMessages ADD chrAttachmentName varchar(150) After chrCC;
+Alter TABLE EmailMessages ADD chrAttachmentType varchar(50) After chrCC;
+
+CREATE TABLE EmailCategories (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  dtCreated DATETIME NOT NULL,
+  chrEmailCategory VARCHAR(100)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+
+/*<---------------------Created and Added on May 3rd 2007------------------------>*/
+CREATE TABLE PNPPages(
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	bParent TINYINT(1) NOT NULL DEFAULT 0,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	idParent SMALLINT UNSIGNED NOT NULL,
+	chrTitle VARCHAR(150) NOT NULL, 
+	txtContent MEDIUMTEXT NOT NULL)
+	TYPE=MyISAM, CHARACTER SET utf8;
+	
+	
+/* May 11, 2007 */
+CREATE TABLE LandingPage (
+  ID TINYINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  txtHTML TEXT
+) TYPE=MyISAM, CHARACTER SET utf8;
+INSERT INTO LandingPage SET ID=1, txtHTML='<B>This is the Comm Tool Landing Page</B>';
+
+
+CREATE TABLE EmailStatus (
+  ID TINYINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrStatus VARCHAR(25) NOT NULL
+) TYPE=MyISAM, CHARACTER SET utf8;
+INSERT INTO EmailStatus SET ID=1, chrStatus='Open';
+INSERT INTO EmailStatus SET ID=2, chrStatus='Pending';
+INSERT INTO EmailStatus SET ID=3, chrStatus='Closed';
+
+Alter TABLE EmailMessages ADD idStatus TINYINT DEFAULT 1 After idType;
+
+/* May 14, 2007 */
+CREATE TABLE EmailComments (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idEmailMessage SMALLINT NOT NULL,
+  idUser SMALLINT NOT NULL,
+  dtStamp DATETIME NOT NULL,
+  txtMessage TEXT
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* May 16, 2007 */
+Alter TABLE RetailStores ADD chrEmail VARCHAR(80) NOT NULL After chrStoreNum;
+Alter TABLE RetailStores ADD chrAddress2 VARCHAR(200) NOT NULL After chrAddress;
+Alter TABLE RetailStores ADD chrAddress3 VARCHAR(200) NOT NULL After chrAddress2;
+Alter TABLE RetailStores ADD chrCountry VARCHAR(3) NOT NULL DEFAULT 'US' After chrPostalCode;
+
+UPDATE RetailStores SET idGeo=1 WHERE chrGeo='US';
+UPDATE RetailStores SET idGeo=2 WHERE chrGeo='Canada';
+UPDATE RetailStores SET idGeo=3 WHERE chrGeo='Japan';
+UPDATE RetailStores SET idGeo=4 WHERE chrGeo='UK';
+UPDATE RetailStores SET idGeo=5 WHERE chrGeo='Italy';	
+
+/* May 21 2007 */
+
+Alter TABLE Users ADD bSuperAdmin TINYINT(1) NOT NULL DEFAULT '0' After bDeleted;
+Alter TABLE Users ADD bCommtool TINYINT(1) NOT NULL DEFAULT '0' After bSuperUser;
+Alter TABLE Users ADD bPandP TINYINT(1) NOT NULL DEFAULT '0' After bCommtool;
+Alter TABLE Users ADD bNSORemodel TINYINT(1) NOT NULL DEFAULT '0' After bPandP;
+
+ALTER TABLE PNPPages ADD idGeo SMALLINT(2) DEFAULT 0 AFTER idParent;
+
+ALTER TABLE PNPPages ADD dOrder DOUBLE AFTER idGeo; 
+ALTER TABLE PNPPages ADD dOrderChild DOUBLE AFTER dOrder; 
+
+/* June 6 2007 */
+
+CREATE TABLE `Audit` (
+  `ID` int(5) unsigned NOT NULL auto_increment,
+  `idType` tinyint(2) unsigned default NULL,
+  `idRecord` int(10) unsigned default NULL,
+  `idUser` smallint(3) unsigned default NULL,
+  `dtDatetime` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `chrTableName` varchar(35) character set latin1 default NULL,
+  `chrColumnName` varchar(35) character set latin1 default NULL,
+  `txtOldValue` text character set latin1,
+  `txtNewValue` text character set latin1,
+  KEY `ID` (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=68 DEFAULT CHARSET=utf8;
+
+/* June 7 2007 */
+ALTER TABLE PNPPages ADD bVisable TINYINT(1) NOT NULL DEFAULT '1' AFTER bDeleted;
+ALTER TABLE PNPPages ADD bPVisable TINYINT(1) NOT NULL DEFAULT '1' AFTER bVisable;
+ALTER TABLE PNPPages ADD dtCreated DATETIME NOT NULL AFTER bPVisable;
+ALTER TABLE PNPPages ADD dtUpdated TIMESTAMP NOT NULL AFTER dtCreated;
+UPDATE PNPPages SET dtCreated=now(), dtUpdated=now();
+ALTER TABLE PNPPages ADD idCUser SMALLINT(5) NOT NULL DEFAULT '6' AFTER dtCreated;
+ALTER TABLE PNPPages ADD idUser SMALLINT(5) NOT NULL DEFAULT '6' AFTER dtUpdated;
+ALTER TABLE RFLEmails ADD bVisable TINYINT(1) NOT NULL DEFAULT '1' AFTER bDeleted;
+
+/* September 5th 2007 */
+ALTER TABLE Geos ADD chrEmailAddress VARCHAR(100) NOT NULL DEFAULT 'storeops@apple.com';
+
+/* Sept 21, 2007 */
+CREATE TABLE NSOPictureTypes (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrNSOPictureType VARCHAR(100),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSOFileTypes (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrNSOFileType VARCHAR(100),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSOTypes (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrNSOType VARCHAR(100),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSOTasks (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  intDateOffset INT NOT NULL DEFAULT 0,
+  chrNSOTask VARCHAR(255),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSOUsers (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idPerson MEDIUMINT UNSIGNED NOT NULL
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSONotifications (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrFirst VARCHAR(100),
+  chrLast VARCHAR(100),
+  chrEmail VARCHAR(150),
+  chrCompany VARCHAR(200),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* Sept 25, 2007 */
+ALTER TABLE CalendarEvents ADD idNSOType SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER idCalendarType;
+ALTER TABLE CalendarEvents ADD idStore SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER idCalendarType;
+
+CREATE TABLE CalendarFileTypes (
+  ID TINYINT(2) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrCalendarFileType VARCHAR(100),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+INSERT INTO CalendarFileTypes (chrCalendarFileType) VALUES ('Images'),('Documents');
+
+ALTER TABLE CalendarFiles ADD idCalendarFileType TINYINT(2) UNSIGNED NOT NULL AFTER idCalendarType;
+
+/* Sept 27, 2007 */
+ALTER TABLE NSOTasks ADD idNSOCategory TINYINT(2) NOT NULL DEFAULT 0 AFTER bDeleted;
+ALTER TABLE NSOTypes ADD idNSOCategory TINYINT(2) NOT NULL DEFAULT 0 AFTER bDeleted;
+ALTER TABLE CalendarFiles ADD chrFileTitle VARCHAR(255) NOT NULL;
+ALTER TABLE CalendarFiles ADD txtFileDescription TEXT NOT NULL;
+ALTER TABLE CalendarFiles ADD idCalendarEvent MEDIUMINT UNSIGNED AFTER idUser;
+
+/* Oct 1, 2007 */
+ALTER TABLE NSOTasks DROP idNSOCategory;
+ALTER TABLE NSOTasks ADD idNSOType SMALLINT UNSIGNED NOT NULL AFTER bDeleted;   
+
+CREATE TABLE NSOTaskAssoc (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idNSOTask SMALLINT UNSIGNED NOT NULL,
+  idCalendarEvent SMALLINT UNSIGNED NOT NULL,
+  index(idNSOTask),
+  index(idCalendarEvent)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSONotificationAssoc (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idNSONotification SMALLINT UNSIGNED NOT NULL,
+  idCalendarEvent SMALLINT UNSIGNED NOT NULL,
+  index(idNSONotification),
+  index(idCalendarEvent)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSOUserAssoc (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idNSOUser SMALLINT UNSIGNED NOT NULL,
+  idCalendarEvent SMALLINT UNSIGNED NOT NULL,
+  index(idNSOUser),
+  index(idCalendarEvent)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* Oct 3, 2007 */
+ALTER TABLE NSOTaskAssoc ADD idUser SMALLINT UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE NSOTaskAssoc ADD intNSOTaskStatus SMALLINT(3) NOT NULL DEFAULT 0;
+ALTER TABLE NSOTaskAssoc ADD chrKEY VARCHAR(40) NOT NULL DEFAULT 0 AFTER ID;
+ALTER TABLE NSOTaskAssoc ADD txtNote TEXT;
+
+ALTER TABLE NSONotifications ADD bDefault TINYINT(1) DEFAULT 0 AFTER bDeleted;
+
+/* Oct 3, 2007 */
+ALTER TABLE NSOTaskAssoc ADD intDateOffset SMALLINT(3) NOT NULL DEFAULT 0 AFTER intNSOTaskStatus;
+
+/* Oct 4, 2007 */
+CREATE TABLE NSOs (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  idNSOType SMALLINT UNSIGNED NOT NULL,
+  idStore SMALLINT UNSIGNED NOT NULL,
+  dBegin DATE NOT NULL,
+  dWorkBegin DATE NOT NULL,
+  dEnd DATE NOT NULL,
+  chrCalendarEvent VARCHAR(100),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+ALTER TABLE CalendarEvents ADD idNSO SMALLINT NOT NULL DEFAULT 0 AFTER idNSOType;
+ALTER TABLE NSOTaskAssoc ADD idNSO SMALLINT NOT NULL DEFAULT 0 AFTER idCalendarEvent;
+ALTER TABLE NSOUserAssoc ADD idNSO SMALLINT NOT NULL DEFAULT 0 AFTER idCalendarEvent;
+ALTER TABLE NSONotificationAssoc ADD idNSO SMALLINT NOT NULL DEFAULT 0 AFTER idCalendarEvent;
+ALTER TABLE CalendarFiles ADD idNSO SMALLINT NOT NULL DEFAULT 0 AFTER idCalendarEvent;
+
+/* Oct 5, 2007 */
+CREATE TABLE NSONotes (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  idNSO SMALLINT UNSIGNED NOT NULL,
+  dtCreated DATE NOT NULL,
+  txtNote TEXT,
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+
+CREATE TABLE UserTitles (
+  ID SMALLINT(3) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrFieldName VARCHAR(100) NOT NULL,
+  chrUserTitle VARCHAR(100) NOT NULL,
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+INSERT INTO UserTitles (chrFieldName,chrUserTitle) VALUES ('idUTStoreManager','Store Manager'),('idUTNSOTeamLead','NSO Team Lead'),('idUTDevManager','Development Manager'),('idUTDevCoord','Development Coordinator'),('idUTRegionalDir','Regional Director'),('idUTRegionalAss','Regional Assistant'),('idUTRetailSystems','Retail Systems'),('idUTRetailFacMan','Retail Facilities Manager'),('idUTVisMercLead','Visual Merchandising Lead'),('idUTICS','ICS Mentor'),('idUTMG','MG Mentor'),('idUTInStoreTrainer','In Store Trainer'),('idUTMentManager','Mentor Manager');
+
+CREATE TABLE NSOUserTitleAssoc (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  idNSO SMALLINT UNSIGNED NOT NULL,
+  idUserTitle SMALLINT UNSIGNED NOT NULL
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+ALTER TABLE NSOs ADD idResponsible MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 AFTER idUser;
+
+
+/* Oct 15, 2007 */
+ALTER TABLE NSOs ADD chrStoreManager VARCHAR(100) AFTER chrCalendarEvent;
+ALTER TABLE NSOs ADD chrICSMentor VARCHAR(100) AFTER chrCalendarEvent;
+ALTER TABLE NSOs ADD chrMGMentor VARCHAR(100) AFTER chrCalendarEvent;
+ALTER TABLE NSOs ADD chrInStoreTrainer VARCHAR(100) AFTER chrCalendarEvent;
+ALTER TABLE NSOs ADD chrMentorManager VARCHAR(100) AFTER chrCalendarEvent;
+ALTER TABLE NSOs ADD txtHotel TEXT;
+ALTER TABLE NSOs ADD txtAirport TEXT;
+
+/* Oct 23, 2007 */
+ALTER TABLE NSONotifications ADD chrGroup VARCHAR(200);
+
+/* Oct 25, 2007 */
+CREATE TABLE NSOTypeFiles (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bAllTypes TINYINT(1) NOT NULL DEFAULT 0,
+  idNSOType SMALLINT UNSIGNED NOT NULL,
+  idCalendarFileType SMALLINT(3) UNSIGNED NOT NULL,
+  intFileSize INT NOT NULL,
+  chrFileType VARCHAR(40) NOT NULL,
+  chrFileName VARCHAR(100) NOT NULL
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSOTravelPlans (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  idNSO SMALLINT UNSIGNED NOT NULL,
+  dBegin DATE NOT NULL,
+  dEnd DATE NOT NULL,
+  tBegin TIME NOT NULL,
+  tEnd TIME NOT NULL,
+  txtNotes TEXT
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+
+ALTER TABLE CalendarFiles ADD chrThumbnail VARCHAR(155);
+ALTER TABLE UserTitles ADD dOrder DOUBLE AFTER bDeleted;
+ALTER TABLE NSOUserTitleAssoc ADD chrRecord VARCHAR(255);
+
+/* Oct 26, 2007 */
+ALTER TABLE NSOTravelPlans ADD chrShortTitle VARCHAR(75) AFTER tEnd;
+ALTER TABLE CalendarFiles ADD bPrimary TINYINT(1) NOT NULL DEFAULT 0 AFTER chrKEY;
+ALTER TABLE CalendarFiles ADD chrMedium VARCHAR(155);
+
+/* Nov 1, 2007 */
+CREATE TABLE NSOFeedback (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  txtFeedback TEXT
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* Nov 2, 2007 */
+CREATE TABLE NSOFileGroups (
+  ID TINYINT(2) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrNSOFileGroup VARCHAR(100),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+ALTER TABLE CalendarFiles ADD idNSOFileGroup TINYINT(2) NOT NULL AFTER idCalendarFileType;
+
+
+CREATE TABLE StoreHours (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idStore SMALLINT UNSIGNED NOT NULL,
+  idDayOfWeek TINYINT(2) NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  tOpening TIME,
+  tClosing TIME,
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE StoreHoursSpecial (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idStore SMALLINT UNSIGNED NOT NULL,
+  idHoliday SMALLINT UNSIGNED NOT NULL,
+  idDayOfWeek TINYINT(2) NOT NULL,
+  dDate DATE NOT NULL,
+  tOpening TIME NOT NULL,
+  tClosing TIME NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE Holidays (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  bVisible TINYINT(1) NOT NULL DEFAULT 0,
+  dtCreated DATETIME NOT NULL,
+  dBegin DATE NOT NULL,
+  dEnd DATE NOT NULL,
+  chrHoliday VARCHAR(150) NOT NULL,
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* November 5th 2007 */
+ALTER TABLE StoreHours ADD bClosed TINYINT(1) NOT NULL DEFAULT 0 AFTER bDeleted;
+ALTER TABLE StoreHoursSpecial ADD bClosed TINYINT(1) NOT NULL DEFAULT 0 AFTER bDeleted;
+
+/* November 6th 2007 */
+CREATE TABLE EvalTypes (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrEvalType VARCHAR(150) NOT NULL,
+  index(bDeleted)
+) TYPE=MyISAM, CHARACTER SET utf8;
+INSERT INTO EvalTypes (chrEvalType) VALUES ('Sentence Box'),('Paragraph Box'),('Select Box'),('Check Box'),('Radio Button');
+
+CREATE TABLE Evals (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+INSERT INTO Evals SET chrKEY='10192d469d19400a5e20d0aa20160bfebb7d8a40',idUser='1',dtCreated=now();
+
+CREATE TABLE EvalQuestions (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bRequired TINYINT(1) NOT NULL,
+  idEval SMALLINT NOT NULL,
+  idEvalType TINYINT(2) NOT NULL,
+  dOrder DOUBLE NOT NULL,
+  chrQuestion VARCHAR(255) NOT NULL,
+  txtOptions TEXT NOT NULL,
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* November 6th 2007 */
+CREATE TABLE EvalAnswers (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  idUser SMALLINT NOT NULL,
+  idEvalQuestion TINYINT(2) NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  txtAnswer TEXT NOT NULL,
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* November 13th, 2007 */
+ALTER TABLE Users ADD bStoreHours TINYINT(1) NOT NULL DEFAULT 0 AFTER bNOSRemodel;
+
+/* November 14, 2007 */
+ALTER TABLE NSOs ADD bReminderSent TINYINT(1) NOT NULL DEFAULT 0 AFTER bDeleted;
+
+/* November 29, 2007 */
+CREATE TABLE NSOGlobalFiles (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  idType SMALLINT NOT NULL,
+  idUser SMALLINT NOT NULL,
+  dbFileSize DOUBLE NOT NULL DEFAULT 0,
+  dtCreated DATETIME NOT NULL,
+  chrFileType VARCHAR(30) NOT NULL,
+  chrFile VARCHAR(150) NOT NULL,
+  chrThumbnail VARCHAR(155) NOT NULL,
+  chrMedium VARCHAR(155) NOT NULL,
+  index(chrKEY),
+  index(idUser),
+  index(idType)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+
+/* Nov 30, 2007 */
+CREATE TABLE NSOPictureGroups (
+  ID TINYINT(2) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrNSOPictureGroup VARCHAR(100),
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+INSERT INTO NSOPictureGroups SET ID=1, chrKEY='893b25da8f84321485ca50deaeeafe411e5b3697', chrNSOPictureGroup='Global';
+UPDATE CalendarFiles SET idNSOFileGroup=1 WHERE idCalendarFileType=1;
+
+/* Dec 7, 2007 */
+CREATE TABLE NSOEvals (
+  ID SMALLINT(2) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  dtStamp DATETIME NOT NULL,
+  idEval SMALLINT UNSIGNED NOT NULL,
+  idNSO SMALLINT UNSIGNED NOT NULL,
+  index(idUser),
+  index(idEval),
+  index(idNSO),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+ALTER TABLE EvalAnswers ADD idNSOEval SMALLINT UNSIGNED NOT NULL;
+
+/* Dec 17th 2007 */
+ALTER TABLE NSOTypes ADD chrColorText VARCHAR(20) DEFAULT '#CCC';
+ALTER TABLE NSOTypes ADD chrColorBG VARCHAR(20) DEFAULT '#333';
+
+/* Dec 18th 2007 */
+ALTER TABLE NSOs ADD dDate2 DATE;
+ALTER TABLE NSOs ADD dDate3 DATE;
+ALTER TABLE NSOs ADD dDate4 DATE;
+
+/* Dec 19th 2007 */
+CREATE TABLE NSOLearn (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	chrKEY VARCHAR(40) NOT NULL,
+	bParent TINYINT(1) NOT NULL DEFAULT 0,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	bShow TINYINT(1) NOT NULL DEFAULT 1,
+	bPShow TINYINT(1) NOT NULL DEFAULT 1,
+	dOrder DOUBLE DEFAULT 9999,
+	dOrderChild DOUBLE DEFAULT 9999,
+	idCreator SMALLINT UNSIGNED NOT NULL,
+	idUpdater SMALLINT UNSIGNED NOT NULL,
+	idParent SMALLINT UNSIGNED,
+	dtCreated DATETIME NOT NULL,
+	dtUpdated TIMESTAMP NOT NULL,
+	chrTitle VARCHAR(255) NOT NULL,
+	txtContent TEXT NOT NULL,
+	index(chrKEY(10)),
+	index(idCreator),
+	index(idUpdater),
+	index(idParent)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+/* Dec 20th 2007 */
+
+CREATE TABLE EvalCats (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	chrKEY VARCHAR(40) NOT NULL,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	intOrder SMALLINT DEFAULT 9999,
+	chrCat VARCHAR(255) NOT NULL,
+	index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+ALTER TABLE EvalQuestions ADD idEvalCat SMALLINT AFTER idEvalType;
+
+/* Jan 7th 2008 */
+
+CREATE TABLE DateChangesQue (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	idNSO SMALLINT UNSIGNED NOT NULL,
+	idUser SMALLINT UNSIGNED NOT NULL,
+	chrField VARCHAR(20) NOT NULL,
+	dOrig VARCHAR(20) NOT NULL,
+	dNew VARCHAR(20) NOT NULL,
+	dtStamp TIMESTAMP NOT NULL
+) TYPE=MyISAM, CHARACTER SET utf8;	 
+
+/* REMOVE NULL VALUE FROM dDate2 - dDate4 */
+
+ALTER TABLE CalendarAccess ADD chrColorText VARCHAR(20) DEFAULT '#CCC' AFTER idCalendarEvent;
+ALTER TABLE CalendarAccess ADD chrColorBG VARCHAR(20) DEFAULT '#333' AFTER chrColorText;
+
+/* Jan 8th 2008 */
+
+ALTER TABLE CalendarAccess ADD bTravelAccess TINYINT(1) DEFAULT 0 AFTER bDeleted;
+ALTER TABLE CalendarAccess ADD txtStoreAccess TEXT;
+
+/* Jan 9th 2008 */
+ALTER TABLE NSOs ADD dtUpdated TIMESTAMP NOT NULL AFTER dEnd;
+ALTER TABLE NSOLearn ADD idType TINYINT(3) NOT NULL DEFAULT 1 AFTER dOrderChild;
+
+/* Jan 11th 2008 */
+ALTER TABLE DateChangesQue ADD chrReason VARCHAR(255);
+ALTER TABLE NSOs ADD idDate2Status TINYINT(2) AFTER dDate2;
+ALTER TABLE NSOs ADD idDate3Status TINYINT(2) AFTER dDate3;
+ALTER TABLE NSOs ADD idDate4Status TINYINT(2) AFTER dDate4;
+ALTER TABLE NSOs ADD idBeginStatus TINYINT(2) AFTER dBegin;
+ALTER TABLE NSOs ADD idEndStatus TINYINT(2) AFTER dEnd;
+
+CREATE TABLE NSODateStatus (
+	ID TINYINT(2) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	chrStatus VARCHAR(100) NOT NULL
+) TYPE=MyISAM, CHARACTER SET utf8;	
+INSERT INTO NSODateStatus (chrStatus) VALUES ('TBD'),('Canceled');
+
+/* Jan 14th 2008 */
+CREATE TABLE NSOSiteSurveyAssoc (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idNSONotification SMALLINT UNSIGNED NOT NULL,
+  idCalendarEvent SMALLINT UNSIGNED NOT NULL,
+  index(idNSONotification),
+  index(idCalendarEvent)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE NSOEvaluationsAssoc (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idNSONotification SMALLINT UNSIGNED NOT NULL,
+  idCalendarEvent SMALLINT UNSIGNED NOT NULL,
+  index(idNSONotification),
+  index(idCalendarEvent)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+ALTER TABLE NSOSiteSurveyAssoc ADD idNSO SMALLINT NOT NULL DEFAULT 0 AFTER idCalendarEvent;
+ALTER TABLE NSOEvaluationsAssoc ADD idNSO SMALLINT NOT NULL DEFAULT 0 AFTER idCalendarEvent;
+
+ALTER TABLE NSOs ADD bCompleteSent TINYINT(1) NOT NULL DEFAULT 0 AFTER bDateChanged;
+ALTER TABLE NSOs ADD dEvalReminder DATE NOT NULL AFTER dtUpdated;
+
+/* Feb 6th 2008 */
+CREATE TABLE CalSecGroups (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	chrGroup VARCHAR(100) NOT NULL
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE CalSecFiles (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	idGroup SMALLINT UNSIGNED NOT NULL,
+	chrOptions VARCHAR(50) NOT NULL,
+	chrPath VARCHAR(200) NOT NULL,
+	chrFile VARCHAR(100) NOT NULL,
+	chrDescription VARCHAR(200) NOT NULL,
+	index(idGroup)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE CalSecurity (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	chrKEY VARCHAR(40) NOT NULL,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	bGlobal TINYINT(1) NOT NULL DEFAULT 0,
+	chrSecurity VARCHAR(200) NOT NULL,
+	index(chrKey)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE CalSecuritySelections (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	idCalSecurity SMALLINT UNSIGNED NOT NULL,
+	idCalSecFile SMALLINT UNSIGNED NOT NULL,
+	chrLevels VARCHAR(100) NOT NULL,
+	index(idCalSecurity),
+	index(idCalSecFile)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+ALTER TABLE CalendarAccess ADD idSecurity SMALLINT NOT NULL;
+
+INSERT INTO `CalSecGroups` VALUES (1,0,'Home/Survey/Evaluation/Learning/FeedBack Pages'),(2,0,'Events Pages'),(3,0,'Calendar Pages'),(4,0,'Admin Pages');
+
+INSERT INTO `CalSecFiles` VALUES (1,0,1,'1','/','index.php','Home Page'),(2,0,1,'1,5','/learn/','index.php','Site Tour Section'),(3,0,1,'1,5','/remodel/','index.php','About Remodels Section'),(4,0,1,'1,2','/sitesurveys/','index.php','Site Survey Section'),(5,0,1,'1,2','/evals/','index.php','Evaluations Section'),(6,0,1,'2','/feedback/','index.php','Feedback Section'),(7,0,2,'1,2,3,4','/nso/','index.php','Events List Page'),(8,0,2,'1','/nso/','landing.php','Event Landing Page'),(9,0,2,'1,2,3,4','/nso/','view.php','PM Tool'),(10,0,3,'1','/','day.php','Calendar Day Page'),(11,0,3,'1','/','week.php','Calendar Week Page'),(12,0,3,'1','/','year.php','Calendar Year Page'),(13,0,4,'1','/admin/','index.php','General Access'),(14,0,4,'1,2,3,4','/admin/users/','index.php','Calendar Users'),(15,0,4,'1,2,3,4','/admin/caltypes/','index.php','Calendar Types'),(16,0,4,'3','/admin/landingpage/','index.php','Edit Landing Page'),(17,0,4,'1,2,3,4','/admin/learn/','index.php','Site Tour Articles'),(18,0,4,'1,2,3,4','/admin/remodel/','index.php','About Remodels Articles'),(19,0,4,'1,4','/admin/feedback/','index.php','Feedback'),(20,0,4,'1,2,3,4','/admin/nsotypes/','index.php','Types'),(21,0,4,'1,2,3,4','/admin/nsotasks/','index.php','Tasks'),(22,0,4,'1,2,3,4','/admin/nsonotifications/','index.php','Notifications'),(23,0,4,'3','/admin/nsonotifdefault/','index.php','Notificiations Defaults'),(24,0,4,'1,2,3,4','/admin/nsotravelplans/','index.php','Travel Plans'),(25,0,4,'2','/admin/globalfiles/','index.php','Global Files Upload'),(26,0,4,'1,2,3,4','/admin/picturegroups/','index.php','Picture Groups'),(27,0,4,'1,2,3,4','/admin/filegroups/','index.php','File Groups'),(28,0,4,'3,4','/admin/evals/','index.php','Evaluations Setup'),(29,0,4,'1,2,3,4','/admin/evalcats/','index.php','Evaluation Categories'),(30,0,4,'1,3','/admin/nsouserassoc/','index.php','Event User Association'),(31,0,4,'1','/admin/datechanges/','index.php','Date Changes E-mailer'),(32,0,4,'1,2,3,4','/admin/securitygroups/','index.php','Security Groups');
+
+ALTER TABLE CalSecFiles ADD dOrder DOUBLE AFTER idGroup;
+
+INSERT INTO CalSecFiles (idGroup,chrOptions,chrDescription) VALUES (4,'1','Calendar Month Page');
+
+ALTER TABLE NSOs ADD dSSReminder DATE NOT NULL AFTER dEvalReminder;
+
+INSERT INTO UserTitles (dOrder,chrFieldName,chrUserTitle) VALUES ('6.5','idUTRegionalAss','Regional Assistant');
+
+ALTER TABLE NSOEvals ADD bDeleted TINYINT(1) NOT NULL DEFAULT 0 after chrKEY;
+
+ALTER TABLE Users ADD dtCalLogin DATETIME NULL AFTER bStoreHours;
+
+/* Feb 15th 2008 */
+
+INSERT INTO CalSecFiles (idGroup,dOrder,chrOptions,chrDescription) VALUES (2,'8.1','1,2,3,4','Punch List');
+
+INSERT INTO CalSecFiles (idGroup,dOrder,chrOptions,chrDescription) VALUES (4,'31.5','1,2,3,4','Punch List Categories');
+
+CREATE TABLE PunchCats (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	chrKEY VARCHAR(40) NOT NULL,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	dOrder DOUBLE,
+	chrPunchCat VARCHAR(200) NOT NULL,
+	index(chrKEY)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE PunchLists (
+	ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	chrKEY VARCHAR(40) NOT NULL,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	idUser SMALLINT UNSIGNED NOT NULL,
+	idNSO MEDIUMINT UNSIGNED NOT NULL,
+	dtCreated DATETIME NOT NULL,
+	index(chrKEY),
+	index(idUser),
+	index(idNSO)
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE PunchItems (
+	ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	bComplete TINYINT(1) NOT NULL DEFAULT 0,
+	idPunchList MEDIUMINT UNSIGNED NOT NULL,
+	idCat SMALLINT UNSIGNED NOT NULL,
+	dtEntered DATETIME NOT NULL,
+	dtUpdated DATETIME NOT NULL,
+	dtCompleted DATETIME NOT NULL,
+	chrItem VARCHAR(255) NOT NULL,
+	chrOwner VARCHAR(255) NOT NULL,
+	chrCompletion VARCHAR(255) NOT NULL,
+	txtNotes TEXT NOT NULL,
+	index(idPunchList),
+	index(idCat)
+) TYPE=MyISAM, CHARACTER SET utf8;
+	
+	
+/* Feb 25th 2008 */
+ALTER TABLE RetailStores ADD bShow TINYINT(1) DEFAULT 1 AFTER bDeleted;
+
+/* Feb 27th 2008 */
+ALTER TABLE NSOs ADD txtScope TEXT;
+ALTER TABLE NSOs ADD bScope TINYINT(1) DEFAULT 0;
+
+CREATE TABLE SSCats (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	chrKEY VARCHAR(40) NOT NULL,
+	bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+	intOrder SMALLINT DEFAULT 9999,
+	chrCat VARCHAR(255) NOT NULL,
+	index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+INSERT INTO CalSecFiles (ID,idGroup,dOrder,chrOptions,chrDescription) VALUES (37,4,'31.1','3,4','Site Survey Setup');
+INSERT INTO CalSecFiles (ID,idGroup,dOrder,chrOptions,chrDescription) VALUES (38,4,'31.2','1,2,3,4','Site Survey Categories');
+
+
+CREATE TABLE NSOSS (
+  ID SMALLINT(2) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  dtStamp DATETIME NOT NULL,
+  idSS SMALLINT UNSIGNED NOT NULL,
+  idNSO SMALLINT UNSIGNED NOT NULL,
+  index(idUser),
+  index(idSS),
+  index(idNSO),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE SSTypes (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrSSType VARCHAR(150) NOT NULL,
+  index(bDeleted)
+) TYPE=MyISAM, CHARACTER SET utf8;
+INSERT INTO SSTypes (chrSSType) VALUES ('Sentence Box'),('Paragraph Box'),('Select Box'),('Check Box'),('Radio Button');
+
+CREATE TABLE SSs (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  index(bDeleted),
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+INSERT INTO SSs SET chrKEY='10192d469d19400a5e20d0aa20160bfebb7d8a40',idUser='1',dtCreated=now();
+
+CREATE TABLE SSQuestions (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bRequired TINYINT(1) NOT NULL,
+  idSS SMALLINT NOT NULL,
+  idSSType TINYINT(2) NOT NULL,
+  dOrder DOUBLE NOT NULL,
+  chrQuestion VARCHAR(255) NOT NULL,
+  txtOptions TEXT NOT NULL,
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE SSAnswers (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  idUser SMALLINT NOT NULL,
+  idSSQuestion TINYINT(2) NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  txtAnswer TEXT NOT NULL,
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+ALTER TABLE SSQuestions ADD idSSCat SMALLINT AFTER idSSType;
+
+ALTER TABLE SSAnswers ADD idNSOSS SMALLINT UNSIGNED NOT NULL;
+
+ALTER TABLE NSOSS ADD bDeleted TINYINT(1) NOT NULL DEFAULT 0 after chrKEY;
+
+CREATE TABLE SupplyItems (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) DEFAULT 0 NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  dbFileSize DOUBLE NOT NULL DEFAULT 0,
+  chrFileType VARCHAR(30) NOT NULL,
+  chrFile VARCHAR(150) NOT NULL,
+  chrThumbnail VARCHAR(155) NOT NULL,
+  chrMedium VARCHAR(155) NOT NULL,
+  chrItem VARCHAR(255) NOT NULL,
+  txtDescription TEXT NOT NULL,
+  index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+INSERT INTO CalSecFiles (idGroup,dOrder,chrOptions,chrDescription) VALUES (4,'34','1,2,3,4','Supply Items');
+
+CREATE TABLE SupplyAssoc (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) DEFAULT 0 NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  dtUpdated DATETIME NOT NULL,
+  idNSO SMALLINT UNSIGNED NOT NULL,
+  idSupplyItem MEDIUMINT UNSIGNED NOT NULL,
+  intQSent SMALLINT UNSIGNED NOT NULL,
+  intQReceived SMALLINT UNSIGNED NOT NULL,
+  index(chrKEY(10)),
+  index(idNSO),
+  index(idSupplyItem)
+) TYPE=MyISAM, CHARACTER SET utf8;
+  
+INSERT INTO CalSecFiles (idGroup,dOrder,chrOptions,chrDescription) VALUES (2,'9.5','1,3','Supply Items Check-in');
+
+ALTER TABLE NSOs ADD bShow TINYINT(1) NOT NULL DEFAULT 1 AFTER bDeleted;
+
+UPDATE UserTitles SET chrUserTitle='Store/General Manager' WHERE ID=1;
+
+INSERT INTO UserTitles SET dOrder='5.5', chrFieldName='idUTMarManager', chrUserTitle='Market Manager';
+
+INSERT INTO NSOPeopleAssoc SET chrKEY='9h3655d2c5ed9b2e66g11cae134fbff428dge02d', chrFieldName='idUTMarManager', chrField='Market Manager';
+
+
+CREATE TABLE `NSOCorpTaskAssoc` (
+  `ID` mediumint(8) NOT NULL auto_increment,
+  `chrKEY` varchar(40) NOT NULL default '0',
+  `idNSOCorpTask` smallint(5) unsigned NOT NULL,
+  `idCalendarEvent` smallint(5) unsigned NOT NULL,
+  `idNSO` smallint(6) NOT NULL default '0',
+  `idUser` smallint(5) unsigned NOT NULL default '0',
+  `intNSOTaskStatus` smallint(3) NOT NULL default '0',
+  `intDateOffset` smallint(3) NOT NULL default '0',
+  `txtNote` text,
+  PRIMARY KEY  (`ID`),
+  KEY `idNSOTask` (`idNSOCorpTask`),
+  KEY `idCalendarEvent` (`idCalendarEvent`)
+) ENGINE=MyISAM AUTO_INCREMENT=1084 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `NSOCorpTasks` (
+  `ID` mediumint(8) unsigned NOT NULL auto_increment,
+  `chrKEY` varchar(40) NOT NULL,
+  `bDeleted` tinyint(1) NOT NULL default '0',
+  `idNSOType` smallint(5) unsigned NOT NULL,
+  `dOrder` double NOT NULL default '9999',
+  `intDateOffset` int(11) NOT NULL default '0',
+  `chrNSOCorpTask` varchar(255) default NULL,
+  PRIMARY KEY  (`ID`),
+  KEY `bDeleted` (`bDeleted`),
+  KEY `chrKEY` (`chrKEY`(10))
+) ENGINE=MyISAM AUTO_INCREMENT=97 DEFAULT CHARSET=utf8;
+
+INSERT INTO CalSecFiles (idGroup,dOrder,chrOptions,chrDescription) VALUES (4,'23.5','1,2,3,4','Corporate Parner&#39;s Tasks');
+
+/* May 12th 2008 */
+
+INSERT INTO NSOPeopleAssoc SET chrKEY='8h4766d3c6ed8b3e77g22cae245fbff539dge13d', chrFieldName='idUTTelcomNetwork', chrField='Telecom/Network Person';
+INSERT INTO NSOPeopleAssoc SET chrKEY='9h5877d4c7ed9b4e88g33cae356fbff640dge24d', chrFieldName='idUTTrainingPerson', chrField='Training Team Person';
+INSERT INTO UserTitles SET dOrder='8.2', chrFieldName='idUTTelcomNetwork', chrUserTitle='Telecom/Network Person';
+INSERT INTO UserTitles SET dOrder='8.4', chrFieldName='idUTTrainingPerson', chrUserTitle='Training Team Person';
+ALTER TABLE CalendarAccess ADD bShowOrangeEvents TINYINT(1) NOT NULL DEFAULT 0 AFTER bTravelAccess;
+
+UPDATE CalendarAccess SET bShowOrangeEvents=1 WHERE idSecurity=1;
+
+CREATE TABLE NSONewFeatures (
+	ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	chrKEY VARCHAR(40) NOT NULL,
+	bShow TINYINT(1) NOT NULL DEFAULT 0,
+	txtAnnoucement TEXT,
+	index(chrKEY(10))
+) TYPE=MyISAM, CHARACTER SET utf8;
+
+INSERT INTO NSONewFeatures (chrKEY,txtAnnoucement) VALUES ('9h3655d2c5ed9b2e66g11cae134fbff428dge02d','');
+INSERT INTO CalSecFiles (idGroup,dOrder,chrOptions,chrDescription) VALUES (4,'23.7','3','New Features Popup');
+	

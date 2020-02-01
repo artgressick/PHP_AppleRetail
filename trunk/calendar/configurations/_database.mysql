@@ -1,0 +1,213 @@
+/* July 30,2007 */
+
+/* Users table is already in use from the parent project.  If one does not exist, it needs to be created with a bCalAccess field */
+ALTER TABLE Users ADD bCalAccess TINYINT(1) NOT NULL DEFAULT 0 AFTER bDeleted;
+
+CREATE TABLE CalendarFiles (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  idUser SMALLINT NOT NULL,
+  dbFileSize DOUBLE NOT NULL DEFAULT 0,
+  dtCreated DATETIME NOT NULL,
+  dtModified DATETIME,
+  chrFileType VARCHAR(30) NOT NULL,
+  chrCalendarFile VARCHAR(150) NOT NULL,
+  index(chrKEY),
+  index(idUser)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE CalendarFileAssocs (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idUser SMALLINT NOT NULL,
+  idCalendar SMALLINT NOT NULL,
+  idFile SMALLINT NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  index(idUser)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+
+CREATE TABLE CalendarEvents (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  bAllDay TINYINT(1) NOT NULL DEFAULT 0,
+  idUser SMALLINT NOT NULL,
+  idCalendarType TINYINT(2) NOT NULL,
+  tBegin TIME NOT NULL,
+  tEnd TIME NOT NULL,
+  dBegin DATE NOT NULL,
+  dEnd DATE NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  dtModified DATETIME,
+  chrCalendarEvent VARCHAR(150) NOT NULL,
+  chrReoccur VARCHAR(30) NOT NULL,
+  chrSeries VARCHAR(40) NOT NULL,
+  txtContent TEXT,
+  index(chrKEY),
+  index(chrSeries),
+  index(bDeleted),
+  index(dBegin)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+
+
+CREATE TABLE CalendarTypes (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrCalendarType VARCHAR(150) NOT NULL,
+  chrColorText VARCHAR(20) NOT NULL DEFAULT '#ccc',
+  chrColorBG VARCHAR(20) NOT NULL DEFAULT '#333'
+) ENGINE=MyISAM, CHARACTER SET utf8;
+
+
+CREATE TABLE CalendarAccessTypes (
+  ID TINYINT(2) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  chrCalendarAccessTypes VARCHAR(150) NOT NULL
+) ENGINE=MyISAM, CHARACTER SET utf8;
+INSERT INTO CalendarAccessTypes (chrCalendarAccessTypes) VALUES ('Add/Edit/Delete'),('Edit'),('Delete');
+
+
+CREATE TABLE CalendarAccess (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  idAccessType SMALLINT NOT NULL,
+  idUser SMALLINT NOT NULL,
+  idCalendarEvent SMALLINT NOT NULL,
+  index(chrKEY),
+  index(bDeleted),
+  index(idUser)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+
+
+/* August 10, 2007 */
+
+CREATE TABLE CalendarQueries (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  dtCreated DATETIME NOT NULL,
+  idUser SMALLINT NOT NULL,
+  chrCalendarQuery TEXT,
+  index(chrKEY),
+  index(bDeleted),
+  index(idUser)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+
+/* October 23, 2007 */
+ALTER TABLE Users ADD bCalAccess TINYINT(1) NOT NULL DEFAULT 0 AFTER bDeleted;
+
+/* November 1, 2007 */
+ALTER TABLE NSOTasks ADD dOrder DOUBLE NOT NULL DEFAULT 999 AFTER idNSOType;
+
+
+/* November 8th 2007 */
+CREATE TABLE SiteSurveys (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  intShelter TINYINT(2),
+  intUseDock TINYINT(2),
+  intMallDelievey TINYINT(2),
+  intDockElevated TINYINT(2),
+  intPassStore TINYINT(2),
+  intLoadAreaElevated TINYINT(2),
+  intTrash TINYINT(2),
+  intTrashKey TINYINT(2),
+  intFood TINYINT(2),
+  tBeginSun TIME,
+  tEndSun TIME,
+  tBeginMon TIME,
+  tEndMon TIME,
+  tBeginTues TIME,
+  tEndTues TIME,
+  tBeginWed TIME,
+  tEndWed TIME,
+  tBeginThurs TIME,
+  tEndThurs TIME,
+  tBeginFri TIME,
+  tEndFri TIME,
+  tBeginSat TIME,
+  tEndSat TIME,
+  dtCreated DATETIME NOT NULL,
+  idUser SMALLINT UNSIGNED NOT NULL,
+  idNSO SMALLINT UNSIGNED NOT NULL,
+  chrMallManagement VARCHAR(255),
+  chrDeliveryTimes VARCHAR(255),
+  chrTruckSizeRest VARCHAR(255),
+  chrClosestDock VARCHAR(255),
+  chrDeliveryContact VARCHAR(255),
+  chrStoreLocation VARCHAR(255),
+  chrLandmark VARCHAR(255),
+  chrEntryRt VARCHAR(255),
+  chrEmployeePark VARCHAR(255),
+  txtDocktoStore TEXT,
+  txtAreatoStore TEXT,
+  txtEquipNeeded TEXT,
+  txtMallRestrictions TEXT,
+  txtAirportHotels TEXT,
+  txtAlarmContacts TEXT,
+  txtConferenceNames TEXT,
+  txtAdditional TEXT,
+  index(chrKEY),
+  index(idUser),
+  index(idNSO)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+ 
+/* November 9th 2007 */
+CREATE TABLE NSOFiles (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  idType SMALLINT NOT NULL,
+  idReference SMALLINT NOT NULL,
+  idUser SMALLINT NOT NULL,
+  dbFileSize DOUBLE NOT NULL DEFAULT 0,
+  dtCreated DATETIME NOT NULL,
+  dtModified DATETIME,
+  chrFileType VARCHAR(30) NOT NULL,
+  chrFile VARCHAR(150) NOT NULL,
+  chrThumbnail VARCHAR(155) NOT NULL,
+  chrMedium VARCHAR(155) NOT NULL,
+  index(chrKEY),
+  index(idUser),
+  index(idType),
+  index(idReference)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+
+/* November 12th 2007 */
+CREATE TABLE NSOPeopleAssoc (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  chrFieldName VARCHAR(100) NOT NULL,
+  chrField VARCHAR(100) NOT NULL,
+  txtUsers TEXT,
+  index(chrKEY)
+) ENGINE=MyISAM, CHARACTER SET utf8;
+INSERT INTO NSOPeopleAssoc (chrKEY,chrFieldName,chrField) VALUES (SHA1('field1'),'idResponsible','Person Responsible'),(SHA1('field2'),'idUTNSOTeamLead','Team Lead'),(SHA1('field3'),'idUTDevManager','Development Manager'),(SHA1('field4'),'idUTDevCoord','Development Coordinator'),(SHA1('field5'),'idUTRegionalDir','Regional Director'),(SHA1('field6'),'idUTRegionalAss','Regional Assistant'),(SHA1('field7'),'idUTRetailSystems','Retail Systems'),(SHA1('field8'),'idUTRetailFacMan','Retail Facilities Manager');
+ 
+/* November 14th 2007 */
+CREATE TABLE TravelEvents (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  chrKEY VARCHAR(40) NOT NULL,
+  bDeleted TINYINT(1) NOT NULL DEFAULT 0,
+  bAllDay TINYINT(1) NOT NULL DEFAULT 0,
+  idUser SMALLINT NOT NULL,
+  idCalendarType TINYINT(2) NOT NULL,
+  idTravel SMALLINT NOT NULL,
+  tBegin TIME NOT NULL,
+  tEnd TIME NOT NULL,
+  dBegin DATE NOT NULL,
+  dEnd DATE NOT NULL,
+  dtCreated DATETIME NOT NULL,
+  dtModified DATETIME,
+  chrCalendarEvent VARCHAR(150) NOT NULL,
+  chrReoccur VARCHAR(30) NOT NULL,
+  chrSeries VARCHAR(40) NOT NULL,
+  txtContent TEXT,
+  index(chrKEY),
+  index(chrSeries),
+  index(bDeleted),
+  index(dBegin),
+  index(idTravel)
+) ENGINE=MyISAM, CHARACTER SET utf8;

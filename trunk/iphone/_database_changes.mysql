@@ -1,0 +1,15 @@
+/* Tables are being altered in the RetailEvents Database to work for the Nike Fulfillment Project on June 29, 2006 */
+
+CREATE TABLE iPhoneRequest (
+  ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  bComplete TINYINT(1) NOT NULL DEFAULT 0,
+  chrFirst VARCHAR(30) NOT NULL,
+  chrLast VARCHAR(40) NOT NULL,
+  chrEmail VARCHAR(80) NOT NULL,
+  chrSerial VARCHAR(40) NOT NULL,
+  chrEmpID VARCHAR(20) NOT NULL,
+  chrDivision VARCHAR(100) NOT NULL,
+  idStore SMALLINT,
+  dtCreated DATETIME,
+  bDeleted TINYINT(1) NOT NULL DEFAULT '0'
+) TYPE=MyISAM, CHARACTER SET utf8;
